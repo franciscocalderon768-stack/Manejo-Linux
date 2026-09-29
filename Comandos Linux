@@ -1,0 +1,108 @@
+# 1. Clonar un repositorio remoto a tu máquina
+git clone https://github.com/tu-usuario/tu-repositorio.git
+
+# 2. Ver qué archivos has modificado o creado
+git status
+
+# 3. Preparar todos los cambios para el guardado
+git add .
+
+# 4. Guardar una foto fija de tus cambios con un mensaje explicativo
+git commit -m "Se añade la función de inicio de sesión"
+
+# 5. Enviar los cambios guardados a GitHub
+git push origin main
+
+# 6. Descargar los cambios más recientes que hicieron otros en GitHub
+git pull origin main
+1. Navegación y Gestión de Archivos
+Comando	Sintaxis / Opción Común	Descripción
+ls	ls -la	Lista archivos y directorios. -l muestra detalles (permisos, dueño, tamaño) y -a incluye archivos ocultos.
+cd	cd /ruta/carpeta	Cambia de directorio (cd .. sube un nivel, cd ~ va al directorio personal, cd - vuelve al directorio anterior).
+pwd	pwd	Muestra la ruta absoluta del directorio actual.
+mkdir	mkdir -p carpeta/subcarpeta	Crea directorios. -p crea la estructura completa si las carpetas padre no existen.
+cp	cp -r origen destino	Copia archivos o directorios. -r es obligatorio para copiar carpetas recursivamente.
+mv	mv origen destino	Mueve un archivo/directorio o le cambia el nombre si el destino está en la misma ruta.
+rm	rm -rf carpeta	Elimina archivos o carpetas. -r elimina directorios y -f fuerza la eliminación sin pedir confirmación.
+find	find . -name "*.log"	Busca archivos en el sistema por nombre, tamaño o fecha dentro de la ruta especificada.
+2. Inspección y Edición de Texto
+Comando	Ejemplo de Uso	Descripción
+cat	cat archivo.txt	Imprime el contenido completo de un archivo en la terminal.
+less	less archivo.txt	Muestra el contenido de forma paginada. Usa las flechas para navegar y presiona q para salir.
+head	head -n 20 archivo.txt	Muestra las primeras líneas de un archivo (10 por defecto, o las especificadas con -n).
+tail	tail -f /var/log/syslog	Muestra las últimas líneas. Con -f, se mantiene abierto actualizando el texto en tiempo real.
+grep	grep -rn "ERROR" /var/log/	Busca coincidencia de texto dentro de archivos. -r busca recursivamente y -n muestra el número de línea.
+nano	nano archivo.txt	Editor de texto interactivo en terminal, fácil de usar para modificaciones rápidas.
+vim	vim archivo.txt	Editor de texto avanzado basado en modos (i para insertar texto, :wq para guardar y salir).
+3. Permisos y Administración de Usuarios
+Comando	Ejemplo de Uso	Descripción
+sudo	sudo comando	Ejecuta un comando con permisos de superusuario (root).
+chmod	chmod 755 script.sh	Cambia los permisos de lectura (4), escritura (2) y ejecución (1) de un archivo.
+chown	chown usuario:grupo archivo	Cambia el propietario y el grupo asignado a un archivo o directorio.
+whoami	whoami	Muestra el nombre del usuario activo en la sesión actual.
+id	id	Muestra el ID del usuario (UID), ID del grupo (GID) y los grupos a los que pertenece.
+4. Monitoreo y Diagnóstico del Sistema
+Comando	Opciones Recomendadas	Descripción
+top / htop	htop	Muestra el uso de CPU, memoria RAM, swap y procesos activos en tiempo real (htop es su versión interactiva visual).
+ps	ps aux	Muestra una instantánea de todos los procesos que se están ejecutando en el sistema.
+kill	kill -9 <PID>	Envía una señal para terminar un proceso usando su identificador numérico (PID). -9 es un cierre forzado.
+df	df -h	Muestra el uso de espacio en las particiones de disco en formato legible (GB, MB).
+du	du -sh *	Calcula el tamaño de uso en disco de carpetas y archivos específicos.
+free	free -h	Muestra la memoria RAM total, usada, libre y en caché.
+5. Redes y Transferencia de Datos
+Comando	Ejemplo de Uso	Descripción
+ping	ping -c 4 google.com	Verifica la conectividad con un servidor remoto. -c 4 limita la prueba a 4 paquetes.
+curl	curl -I [https://ejemplo.com](https://ejemplo.com)	Realiza peticiones HTTP/HTTPS para probar APIs, descargar datos o inspeccionar encabezados.
+wget	wget [https://sitio.com/file.zip](https://sitio.com/file.zip)	Descarga archivos directamente desde la web a la carpeta actual.
+ssh	ssh usuario@192.168.1.50	Establece una conexión remota cifrada hacia otro servidor.
+scp	scp archivo.txt usuario@ip:/ruta/	Copia de forma segura un archivo desde el equipo local hacia un servidor remoto mediante SSH.
+ss	ss -tulpn	Muestra los sockets de red activos y los puertos a la escucha en el sistema.
+6. Archivos Comprimidos
+tar -czvf archivo.tar.gz /carpeta: Empaqueta y comprime una carpeta en formato Gzip.
+
+tar -xzvf archivo.tar.gz: Descomprime un archivo .tar.gz.
+
+zip -r archivo.zip /carpeta: Comprime una carpeta completa en formato ZIP.
+
+unzip archivo.zip: Extrae el contenido de un archivo .zip.
+Ejemplos por Tipo de Cambio
+feat: (Nuevas funcionalidades)
+
+git commit -m "feat: agregar sistema de autenticacion con SSH"
+
+git commit -m "feat: crear pagina de perfil de usuario"
+
+fix: (Corrección de errores / bugs)
+
+git commit -m "fix: corregir fallo al ejecutar script en Amazon Linux"
+
+git commit -m "fix: solucionar error de impresion en consola"
+
+docs: (Documentación)
+
+git commit -m "docs: actualizar pasos de instalacion en el README"
+
+git commit -m "docs: agregar lista de comandos mas usados"
+
+chore: (Configuración, herramientas o mantenimiento)
+
+git commit -m "chore: vincular repositorio con GitHub CLI"
+
+git commit -m "chore: agregar archivo .gitignore"
+
+style: (Cambios de formato sin alterar lógica)
+
+git commit -m "style: corregir indentacion y espacios en blanco"
+
+git commit -m "style: ajustar margen en la vista principal"
+
+refactor: (Reestructurar código sin cambiar su función)
+
+git commit -m "refactor: simplificar funcion de conexion SSH"
+
+Reglas Rápidas para un Buen Mensaje
+Sé específico: Evita mensajes genéricos como "cambios", "update", "arreglos" o "test".
+
+Brevedad: Mantén la descripción corta (menos de 50 caracteres) para que se lea completa en la interfaz de GitHub.
+
+Verbo de acción: Describe lo que hace el commit ("agregar", "corregir", "eliminar").git status
