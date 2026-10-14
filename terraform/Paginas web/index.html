@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOGIFLOW | Control Logístico</title>
+<style>
+:root {
+  --navy: #101c36;
+  --blue: #4263eb;
+  --cyan: #20b8c8;
+  --green: #16a36a;
+  --amber: #e9a23b;
+  --red: #df5b62;
+  --bg: #f3f6fb;
+  --ink: #17233c;
+  --muted: #738099;
+  --line: #e5eaf2;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.5 "Segoe UI", Arial, sans-serif;
+}
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 245px;
+  padding: 25px 16px;
+  background: linear-gradient(180deg, #101c36, #152746);
+  color: white;
+  z-index: 3;
+}
+.brand {
+  font-size: 23px;
+  font-weight: 850;
+  padding: 0 12px 28px;
+}
+.brand span { color: #59d3df; }
+.brand small {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #a8b5cd;
+}
+.navlabel {
+  color: #8392ad;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  padding: 8px 12px;
+}
+nav { display: grid; gap: 6px; }
+nav button {
+  border: 0;
+  background: transparent;
+  color: #b9c5d9;
+  text-align: left;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+nav button.active,
+nav button:hover {
+  background: #293d60;
+  color: white;
+}
+.sidefoot {
+  position: absolute;
+  bottom: 25px;
+  left: 25px;
+  color: #9eacc3;
+  font-size: 11px;
+}
+.statusdot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: #46d39a;
+  border-radius: 50%;
+  margin-right: 7px;
+}
+main {
+  margin-left: 245px;
+  padding: 30px 34px;
+  max-width: 1800px;
+}
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.eyebrow {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--blue);
+  font-weight: 800;
+}
+h1 {
+  font-size: 27px;
+  margin: 3px 0;
+}
+.subtitle { color: var(--muted); margin: 0; }
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.datepill, .btn {
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 10px;
+  padding: 10px 13px;
+  color: var(--ink);
+  font-size: 12px;
+}
+.btn { cursor: pointer; font-weight: 700; }
+.btn.primary {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: white;
+}
+.section { display: none; }
+.section.active { display: block; }
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 18px;
+}
+.card, .panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  box-shadow: 0 5px 20px #192b4d09;
+}
+.card { padding: 18px 19px; }
+.cardhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 12px;
+}
+.metric {
+  display: block;
+  font-size: 29px;
+  font-weight: 800;
+  margin: 12px 0 5px;
+}
+.trend { font-size: 11px; color: var(--muted); }
+.trend strong { color: var(--green); }
+.panel { padding: 20px; margin-bottom: 18px; }
+.panelhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.panel h2 { font-size: 15px; margin: 0; }
+.panel p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+.tag {
+  font-size: 10px;
+  background: #f0f4ff;
+  color: #4862bd;
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-weight: 800;
+}
+.charts {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 18px;
+}
+.chartbox { height: 245px; }
+.chartbox canvas { width: 100%; height: 100%; }
+.donutwrap {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-height: 220px;
+}
+.donut {
+  width: 165px;
+  height: 165px;
+  border-radius: 50%;
+  position: relative;
+  flex-shrink: 0;
+}
+.donut:after {
+  content: "";
+  position: absolute;
+  inset: 28px;
+  background: white;
+  border-radius: 50%;
+}
+.donutcenter {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-content: center;
+  text-align: center;
+}
+.donutcenter strong { font-size: 24px; }
+.donutcenter span { font-size: 10px; color: var(--muted); }
+.legend { display: grid; gap: 13px; width: 100%; }
+.legendrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.legendrow b { margin-left: auto; color: var(--ink); }
+.swatch { width: 9px; height: 9px; border-radius: 3px; }
+.twocol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.tablewrap { overflow: auto; }
+table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+th {
+  font-size: 10px;
+  color: #8a96ab;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 11px 10px;
+  border-bottom: 1px solid var(--line);
+}
+td {
+  font-size: 12px;
+  padding: 12px 10px;
+  border-bottom: 1px solid #eff2f7;
+}
+tbody tr:hover { background: #f8faff; }
+.status {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 800;
+}
+.ok { background: #e3f8ef; color: #128356; }
+.warn { background: #fff3d9; color: #9c6500; }
+.bad { background: #ffeaeb; color: #b83943; }
+.barlist { display: grid; gap: 17px; }
+.baritem {
+  display: grid;
+  grid-template-columns: 120px 1fr 45px;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+}
+.track {
+  height: 8px;
+  background: #edf1f7;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+}
+.formgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+.formgrid label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #46536b;
+}
+.formgrid input, .formgrid select {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #dce3ee;
+  border-radius: 9px;
+  background: white;
+  font: inherit;
+}
+.full { grid-column: 1 / -1; }
+.formactions { display: flex; gap: 8px; margin-top: 15px; }
+.message { margin-top: 12px; color: var(--blue); font-weight: 700; }
+.search {
+  border: 1px solid var(--line);
+  padding: 9px 11px;
+  border-radius: 9px;
+  min-width: 210px;
+}
+.sectiontitle { margin: 0 0 16px; font-size: 18px; }
+.footnote { color: var(--muted); font-size: 11px; margin-top: 12px; }
+.empty { padding: 25px; text-align: center; color: var(--muted); }
+
+@media(max-width:1100px) {
+  .sidebar { width: 205px; }
+  main { margin-left: 205px; padding: 24px; }
+  .cards { grid-template-columns: repeat(2, 1fr); }
+  .charts, .twocol { grid-template-columns: 1fr; }
+}
+@media(max-width:700px) {
+  .sidebar { position: static; width: auto; padding: 14px; }
+  .brand { padding: 0 8px 12px; }
+  .navlabel, .sidefoot { display: none; }
+  nav { grid-template-columns: repeat(2, 1fr); }
+  .topbar { align-items: flex-start; flex-direction: column; }
+  .top-actions { flex-wrap: wrap; }
+  main { margin: 0; padding: 16px; }
+  .cards { gap: 9px; }
+  .card { padding: 13px; }
+  .metric { font-size: 23px; }
+  .panel { padding: 15px; }
+  .formgrid { grid-template-columns: 1fr; }
+  .full { grid-column: auto; }
+  .donutwrap { flex-wrap: wrap; justify-content: center; }
+  .baritem { grid-template-columns: 95px 1fr 35px; }
+}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="brand">LOGI<span>FLOW</span>
+    <small>INTELLIGENCE · LOGISTICS</small>
+  </div>
+  <div class="navlabel">Espacio de trabajo</div>
+  <nav>
+    <button class="active" data-section="inicio">▦ Panel ejecutivo</button>
+    <button data-section="cubicaje">▣ Cubicaje y flota</button>
+    <button data-section="almacenamiento">▤ Almacenamiento</button>
+    <button data-section="operaciones">☷ Operaciones</button>
+  </nav>
+  <div class="sidefoot">
+    <span class="statusdot"></span>Entorno de demostración<br><br>
+    Datos simulados para pruebas.
+  </div>
+</aside>
+
+<main>
+<header class="topbar">
+  <div>
+    <div class="eyebrow">Centro de control logístico</div>
+    <h1 id="page-title">Panel ejecutivo</h1>
+    <p class="subtitle">Visibilidad de cubicaje, utilización de flota y capacidad de almacenamiento.</p>
+  </div>
+  <div class="top-actions">
+    <span class="datepill" id="today"></span>
+    <button class="btn" id="export-btn">Exportar CSV ↓</button>
+    <button class="btn primary" id="reset-btn">↻ Reiniciar demo</button>
+  </div>
+</header>
+
+<section class="section active" id="inicio">
+  <div class="cards">
+    <div class="card">
+      <div class="cardhead">Cubicajes registrados</div>
+      <strong class="metric" id="metric-cubicajes">40</strong>
+      <div class="trend"><strong>Datos simulados</strong></div>
+    </div>
+    <div class="card">
+      <div class="cardhead">Vehículos registrados</div>
+      <strong class="metric" id="metric-vehicles">8</strong>
+      <div class="trend">Capacidad de flota consolidada</div>
+    </div>
+    <div class="card">
+      <div class="cardhead">Espacios de almacén</div>
+      <strong class="metric" id="metric-spaces">6</strong>
+      <div class="trend">Bodegas y zonas configuradas</div>
+    </div>
+    <div class="card">
+      <div class="cardhead">Ocupación promedio</div>
+      <strong class="metric" id="metric-occupancy">72%</strong>
+      <div class="trend">Sobre capacidad instalada total</div>
+    </div>
+  </div>
+
+  <div class="charts">
+    <div class="panel">
+      <div class="panelhead">
+        <div><h2>Volumen cubicado por mes</h2><p>Metros cúbicos registrados</p></div>
+        <span class="tag">TENDENCIA</span>
+      </div>
+      <div class="chartbox"><canvas id="monthly-chart"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panelhead">
+        <div><h2>Distribución de operaciones</h2><p>Participación por tipo de movimiento</p></div>
+        <span class="tag">MIX OPERATIVO</span>
+      </div>
+      <div class="donutwrap">
+        <div class="donut" id="operation-donut">
+          <div class="donutcenter"><strong id="total-ops">40</strong><span>operaciones</span></div>
+        </div>
+        <div class="legend" id="operation-legend"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="twocol">
+    <div class="panel">
+      <div class="panelhead"><div><h2>Utilización de vehículos</h2><p>Volumen asignado frente a capacidad nominal</p></div></div>
+      <div class="barlist" id="vehicle-bars"></div>
+    </div>
+    <div class="panel">
+      <div class="panelhead"><div><h2>Ocupación de almacenes</h2><p>Uso de la capacidad disponible</p></div></div>
+      <div class="barlist" id="space-bars"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panelhead"><div><h2>Actividad reciente</h2><p>Últimos movimientos registrados</p></div></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Referencia</th><th>Tipo</th><th>Volumen</th><th>Destino</th><th>Estado</th></tr></thead>
+        <tbody id="recent-table"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="cubicaje">
+  <h2 class="sectiontitle">Cubicaje y administración de flota</h2>
+  <div class="twocol">
+    <div class="panel">
+      <div class="panelhead"><div><h2>Registrar cubicaje</h2><p>Calcula el volumen y el uso de capacidad.</p></div></div>
+      <form id="cubicaje-form">
+        <div class="formgrid">
+          <label>Referencia<input name="referencia" placeholder="CARGA-041" required></label>
+          <label>Vehículo<select name="vehiculo" id="vehicle-select" required></select></label>
+          <label>Largo por bulto (m)<input name="largo" type="number" min=".01" step=".01" value="1.2" required></label>
+          <label>Ancho por bulto (m)<input name="ancho" type="number" min=".01" step=".01" value=".8" required></label>
+          <label>Alto por bulto (m)<input name="alto" type="number" min=".01" step=".01" value=".7" required></label>
+          <label>Cantidad de bultos<input name="cantidad" type="number" min="1" step="1" value="10" required></label>
+        </div>
+        <div class="formactions">
+          <button class="btn primary">Calcular y guardar</button>
+          <button class="btn" type="reset">Limpiar</button>
+        </div>
+        <div class="message" id="cubicaje-result"></div>
+      </form>
+    </div>
+    <div class="panel">
+      <div class="panelhead"><div><h2>Registrar vehículo</h2><p>Agrega un vehículo a la flota.</p></div></div>
+      <form id="vehicle-form">
+        <div class="formgrid">
+          <label>Identificación<input name="nombre" placeholder="Camión 09" required></label>
+          <label>Placa<input name="placa" placeholder="ABC-123" required></label>
+          <label class="full">Capacidad (m³)<input name="capacidad" type="number" min=".1" step=".1" required></label>
+        </div>
+        <div class="formactions"><button class="btn primary">Guardar vehículo</button></div>
+      </form>
+      <p class="footnote">Validar también el peso, las dimensiones internas y las restricciones de carga.</p>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panelhead">
+      <div><h2>Registro de cubicajes</h2><p>40 registros simulados iniciales.</p></div>
+      <input class="search" id="cubicaje-search" placeholder="Buscar referencia o vehículo">
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Referencia</th><th>Vehículo</th><th>Bultos</th><th>Volumen</th><th>Uso capacidad</th><th>Fecha</th><th>Estado</th></tr></thead>
+        <tbody id="cubicajes-table"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="almacenamiento">
+  <h2 class="sectiontitle">Capacidad y ocupación de almacenes</h2>
+  <div class="twocol">
+    <div class="panel">
+      <div class="panelhead"><div><h2>Registrar espacio</h2><p>Configura una bodega o zona.</p></div></div>
+      <form id="space-form">
+        <div class="formgrid">
+          <label>Nombre del espacio<input name="nombre" placeholder="Bodega G" required></label>
+          <label>Ubicación<input name="ubicacion" placeholder="Zona sur" required></label>
+          <label class="full">Capacidad total (m³)<input name="capacidad" type="number" min=".1" step=".1" required></label>
+        </div>
+        <div class="formactions"><button class="btn primary">Guardar espacio</button></div>
+      </form>
+    </div>
+    <div class="panel">
+      <div class="panelhead"><div><h2>Registrar almacenamiento</h2><p>Valida el espacio disponible.</p></div></div>
+      <form id="storage-form">
+        <div class="formgrid">
+          <label>Referencia de carga<input name="referencia" placeholder="ALM-041" required></label>
+          <label>Espacio<select name="espacio" id="space-select" required></select></label>
+          <label class="full">Volumen a almacenar (m³)<input name="volumen" type="number" min=".01" step=".01" required></label>
+        </div>
+        <div class="formactions"><button class="btn primary">Registrar movimiento</button></div>
+        <div class="message" id="storage-result"></div>
+      </form>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panelhead"><div><h2>Capacidad instalada y ocupación</h2><p>Disponible = capacidad total − volumen ocupado.</p></div></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Espacio</th><th>Ubicación</th><th>Capacidad</th><th>Ocupado</th><th>Disponible</th><th>Ocupación</th><th>Estado</th></tr></thead>
+        <tbody id="spaces-table"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="operaciones">
+  <div class="panel">
+    <div class="panelhead">
+      <div><h2>Historial de operaciones</h2><p>Consolidado de cubicajes y almacenamientos.</p></div>
+      <input class="search" id="operations-search" placeholder="Buscar operación">
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Referencia</th><th>Operación</th><th>Volumen</th><th>Destino</th><th>Fecha</th><th>Estado</th></tr></thead>
+        <tbody id="operations-table"></tbody>
+      </table>
+    </div>
+    <p class="footnote">Datos sintéticos de demostración. No representan una operación real.</p>
+  </div>
+</section>
+</main>
+
+<script>
+const state = {
+  vehicles: [],
+  spaces: [],
+  cubicajes: [],
+  almacenamientos: []
+};
+
+const initialVehicles = [
+  {id:"v1",nombre:"Camión rígido 01",placa:"LFA-101",capacidad:32},
+  {id:"v2",nombre:"Camión rígido 02",placa:"LFA-102",capacidad:28},
+  {id:"v3",nombre:"Furgón 03",placa:"LFA-103",capacidad:18},
+  {id:"v4",nombre:"Tractocamión 04",placa:"LFA-104",capacidad:58},
+  {id:"v5",nombre:"Camión mediano 05",placa:"LFA-105",capacidad:24},
+  {id:"v6",nombre:"Furgón 06",placa:"LFA-106",capacidad:16},
+  {id:"v7",nombre:"Tractocamión 07",placa:"LFA-107",capacidad:62},
+  {id:"v8",nombre:"Camión rígido 08",placa:"LFA-108",capacidad:35}
+];
+
+const initialSpaces = [
+  {id:"s1",nombre:"Bodega A",ubicacion:"Zona norte",capacidad:420,ocupado:315},
+  {id:"s2",nombre:"Bodega B",ubicacion:"Zona norte",capacidad:360,ocupado:245},
+  {id:"s3",nombre:"Bodega C",ubicacion:"Zona centro",capacidad:280,ocupado:238},
+  {id:"s4",nombre:"Bodega D",ubicacion:"Zona sur",capacidad:500,ocupado:310},
+  {id:"s5",nombre:"Zona de picking",ubicacion:"Área de despacho",capacidad:160,ocupado:105},
+  {id:"s6",nombre:"Zona de reserva",ubicacion:"Área de almacenamiento",capacidad:600,ocupado:390}
+];
+
+const fmt = n => Number(n).toLocaleString("es-CO", {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 2
+});
+
+const todayISO = () => new Date().toISOString();
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[char]);
+}
+
+function seedData() {
+  state.vehicles = structuredClone(initialVehicles);
+  state.spaces = structuredClone(initialSpaces);
+  state.cubicajes = [];
+  state.almacenamientos = [];
+
+  for (let i = 1; i <= 40; i++) {
+    const vehicle = state.vehicles[(i * 3 + i % 5) % state.vehicles.length];
+    const largo = +(0.35 + (i % 7) * 0.17).toFixed(2);
+    const ancho = +(0.3 + (i % 5) * 0.13).toFixed(2);
+    const alto = +(0.25 + (i % 4) * 0.16).toFixed(2);
+    const cantidad = 4 + (i * 7) % 42;
+    const volumen = +(largo * ancho * alto * cantidad).toFixed(2);
+    const fecha = new Date();
+    fecha.setDate(fecha.getDate() - (i % 30));
+
+    state.cubicajes.push({
+      id:"c" + i,
+      referencia:"CUB-" + String(i).padStart(3,"0"),
+      vehiculoId:vehicle.id,
+      vehiculoNombre:vehicle.nombre + " (" + vehicle.placa + ")",
+      cantidad,
+      largo,
+      ancho,
+      alto,
+      volumen,
+      porcentaje:volumen / vehicle.capacidad * 100,
+      fecha:fecha.toISOString()
+    });
+  }
+
+  state.cubicajes.forEach((cubicaje, i) => {
+    if (i % 3 === 0) {
+      const space = state.spaces[i % state.spaces.length];
+      const volumen = Math.min(
+        cubicaje.volumen,
+        space.capacidad - space.ocupado
+      );
+
+      if (volumen > 0) {
+        space.ocupado += volumen;
+        state.almacenamientos.push({
+          referencia:"ALM-" + String(i + 1).padStart(3,"0"),
+          espacioId:space.id,
+          espacioNombre:space.nombre,
+          volumen:+volumen.toFixed(2),
+          fecha:cubicaje.fecha
+        });
+      }
+    }
+  });
+
+  render();
+}
+
+function getStatus(percent) {
+  if (percent >= 100) return ["Excede","bad"];
+  if (percent >= 85) return ["Alta","warn"];
+  return ["Normal","ok"];
+}
+
+function emptyRow(columns, text = "No hay registros para mostrar.") {
+  return `<tr><td colspan="${columns}" class="empty">${text}</td></tr>`;
+}
+
+function render() {
+  document.querySelector("#metric-cubicajes").textContent = state.cubicajes.length;
+  document.querySelector("#metric-vehicles").textContent = state.vehicles.length;
+  document.querySelector("#metric-spaces").textContent = state.spaces.length;
+
+  const totalCapacity = state.spaces.reduce((sum, s) => sum + s.capacidad, 0);
+  const totalUsed = state.spaces.reduce((sum, s) => sum + s.ocupado, 0);
+  const occupancy = totalCapacity ? totalUsed / totalCapacity * 100 : 0;
+
+  document.querySelector("#metric-occupancy").textContent =
+    Math.round(occupancy) + "%";
+
+  document.querySelector("#vehicle-select").innerHTML =
+    state.vehicles.map(v =>
+      `<option value="${v.id}">${escapeHTML(v.nombre)} — ${escapeHTML(v.placa)}</option>`
+    ).join("");
+
+  document.querySelector("#space-select").innerHTML =
+    state.spaces.map(s =>
+      `<option value="${s.id}">${escapeHTML(s.nombre)} · ${fmt(s.capacidad-s.ocupado)} m³ libres</option>`
+    ).join("");
+
+  document.querySelector("#cubicajes-table").innerHTML =
+    state.cubicajes.slice().reverse().map(c => {
+      const status = getStatus(c.porcentaje);
+      return `<tr>
+        <td><b>${escapeHTML(c.referencia)}</b></td>
+        <td>${escapeHTML(c.vehiculoNombre)}</td>
+        <td>${c.cantidad}</td>
+        <td>${fmt(c.volumen)} m³</td>
+        <td>${fmt(c.porcentaje)}%</td>
+        <td>${new Date(c.fecha).toLocaleDateString("es-CO")}</td>
+        <td><span class="status ${status[1]}">${status[0]}</span></td>
+      </tr>`;
+    }).join("") || emptyRow(7);
+
+  document.querySelector("#spaces-table").innerHTML =
+    state.spaces.map(s => {
+      const percent = s.ocupado / s.capacidad * 100;
+      const status = getStatus(percent);
+      return `<tr>
+        <td><b>${escapeHTML(s.nombre)}</b></td>
+        <td>${escapeHTML(s.ubicacion)}</td>
+        <td>${fmt(s.capacidad)} m³</td>
+        <td>${fmt(s.ocupado)} m³</td>
+        <td>${fmt(Math.max(0,s.capacidad-s.ocupado))} m³</td>
+        <td>${fmt(percent)}%</td>
+        <td><span class="status ${status[1]}">${status[0]}</span></td>
+      </tr>`;
+    }).join("") || emptyRow(7);
+
+  const operations = [
+    ...state.cubicajes.map(c => ({
+      ...c,
+      tipoOperacion:"Cubicaje",
+      destino:c.vehiculoNombre
+    })),
+    ...state.almacenamientos.map(a => ({
+      ...a,
+      tipoOperacion:"Almacenamiento",
+      destino:a.espacioNombre
+    }))
+  ].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+
+  document.querySelector("#operations-table").innerHTML =
+    operations.map(o => `<tr>
+      <td><b>${escapeHTML(o.referencia)}</b></td>
+      <td>${o.tipoOperacion}</td>
+      <td>${fmt(o.volumen)} m³</td>
+      <td>${escapeHTML(o.destino)}</td>
+      <td>${new Date(o.fecha).toLocaleDateString("es-CO")}</td>
+      <td><span class="status ok">Registrado</span></td>
+    </tr>`).join("") || emptyRow(6);
+
+  document.querySelector("#recent-table").innerHTML =
+    operations.slice(0,8).map(o => `<tr>
+      <td><b>${escapeHTML(o.referencia)}</b></td>
+      <td>${o.tipoOperacion}</td>
+      <td>${fmt(o.volumen)} m³</td>
+      <td>${escapeHTML(o.destino)}</td>
+      <td><span class="status ok">Registrado</span></td>
+    </tr>`).join("") || emptyRow(5);
+
+  document.querySelector("#vehicle-bars").innerHTML =
+    state.vehicles.map(v => {
+      const volume = state.cubicajes
+        .filter(c => c.vehiculoId === v.id)
+        .reduce((sum,c) => sum + c.volumen, 0);
+      const percent = volume / v.capacidad * 100;
+      return `<div class="baritem">
+        <span>${escapeHTML(v.nombre)}</span>
+        <div class="track"><div class="fill" style="width:${Math.min(100,percent)}%"></div></div>
+        <b>${percent.toFixed(0)}%</b>
+      </div>`;
+    }).join("");
+
+  document.querySelector("#space-bars").innerHTML =
+    state.spaces.map(s => {
+      const percent = s.ocupado / s.capacidad * 100;
+      return `<div class="baritem">
+        <span>${escapeHTML(s.nombre)}</span>
+        <div class="track"><div class="fill" style="width:${Math.min(100,percent)}%;${percent>=85?"background:var(--amber)":""}"></div></div>
+        <b>${percent.toFixed(0)}%</b>
+      </div>`;
+    }).join("");
+
+  const cubicajesCount = state.cubicajes.length;
+  const storageCount = state.almacenamientos.length;
+  const total = cubicajesCount + storageCount || 1;
+  const percent = cubicajesCount / total * 100;
+
+  document.querySelector("#total-ops").textContent = total;
+  document.querySelector("#operation-donut").style.background =
+    `conic-gradient(var(--blue) 0 ${percent}%,var(--cyan) ${percent}% 100%)`;
+
+  document.querySelector("#operation-legend").innerHTML = `
+    <div class="legendrow"><span class="swatch" style="background:var(--blue)"></span>Cubicajes <b>${cubicajesCount}</b></div>
+    <div class="legendrow"><span class="swatch" style="background:var(--cyan)"></span>Almacenamientos <b>${storageCount}</b></div>
+  `;
+
+  drawMonthlyChart();
+  applySearch();
+}
+
+function drawMonthlyChart() {
+  const canvas = document.querySelector("#monthly-chart");
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+
+  canvas.width = Math.max(300,rect.width*dpr);
+  canvas.height = Math.max(180,rect.height*dpr);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr,dpr);
+
+  const width = canvas.width/dpr;
+  const height = canvas.height/dpr;
+  ctx.clearRect(0,0,width,height);
+
+  const months = ["May","Jun","Jul","Ago","Sep","Oct"];
+  const values = months.map((month,index) =>
+    state.cubicajes
+      .filter(c => {
+        const d = new Date(c.fecha);
+        return d.getMonth() ===
+          ((new Date().getMonth()-5+index+12)%12);
+      })
+      .reduce((sum,c) => sum+c.volumen,0)
+  );
+
+  const max = Math.max(...values,1)*1.2;
+  const left = 35, right = 8, top = 14, bottom = 30;
+  const chartWidth = width-left-right;
+  const chartHeight = height-top-bottom;
+
+  ctx.font = "10px Segoe UI";
+  ctx.fillStyle = "#8995a9";
+  ctx.strokeStyle = "#edf1f7";
+
+  for (let i=0; i<4; i++) {
+    const y = top + chartHeight*i/3;
+    ctx.beginPath();
+    ctx.moveTo(left,y);
+    ctx.lineTo(width-right,y);
+    ctx.stroke();
+    ctx.fillText(Math.round(max*(1-i/3)),2,y+3);
+  }
+
+  const barWidth = Math.min(34,chartWidth/(values.length*1.8));
+
+  values.forEach((value,index) => {
+    const x = left+(index+.5)*chartWidth/values.length-barWidth/2;
+    const barHeight = value/max*chartHeight;
+    const y = top+chartHeight-barHeight;
+    const gradient = ctx.createLinearGradient(0,y,0,top+chartHeight);
+    gradient.addColorStop(0,"#20b8c8");
+    gradient.addColorStop(1,"#4263eb");
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.roundRect(x,y,barWidth,barHeight,5);
+    ctx.fill();
+    ctx.fillStyle = "#7c889e";
+    ctx.textAlign = "center";
+    ctx.fillText(months[index],x+barWidth/2,height-8);
+  });
+}
+
+function applySearch() {
+  const cubicajeQuery =
+    (document.querySelector("#cubicaje-search")?.value || "").toLowerCase();
+
+  document.querySelectorAll("#cubicajes-table tr").forEach(row => {
+    row.style.display =
+      row.innerText.toLowerCase().includes(cubicajeQuery) ? "" : "none";
+  });
+
+  const operationsQuery =
+    (document.querySelector("#operations-search")?.value || "").toLowerCase();
+
+  document.querySelectorAll("#operations-table tr").forEach(row => {
+    row.style.display =
+      row.innerText.toLowerCase().includes(operationsQuery) ? "" : "none";
+  });
+}
+
+document.querySelectorAll("nav button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach(item =>
+      item.classList.toggle("active",item===button)
+    );
+    document.querySelectorAll(".section").forEach(section =>
+      section.classList.toggle("active",section.id===button.dataset.section)
+    );
+
+    const titles = {
+      inicio:"Panel ejecutivo",
+      cubicaje:"Cubicaje y flota",
+      almacenamiento:"Almacenamiento",
+      operaciones:"Operaciones"
+    };
+
+    document.querySelector("#page-title").textContent =
+      titles[button.dataset.section];
+
+    if (button.dataset.section==="inicio") {
+      setTimeout(drawMonthlyChart,30);
+    }
+  });
+});
+
+document.querySelector("#vehicle-form").addEventListener("submit",event => {
+  event.preventDefault();
+  const form = new FormData(event.currentTarget);
+
+  state.vehicles.push({
+    id:"v"+Date.now(),
+    nombre:form.get("nombre").trim(),
+    placa:form.get("placa").trim().toUpperCase(),
+    capacidad:Number(form.get("capacidad"))
+  });
+
+  event.currentTarget.reset();
+  render();
+});
+
+document.querySelector("#cubicaje-form").addEventListener("submit",event => {
+  event.preventDefault();
+  const form = new FormData(event.currentTarget);
+  const vehicle = state.vehicles.find(v => v.id===form.get("vehiculo"));
+
+  if (!vehicle) {
+    alert("Registra primero un vehículo.");
+    return;
+  }
+
+  const volume = +(
+    Number(form.get("largo")) *
+    Number(form.get("ancho")) *
+    Number(form.get("alto")) *
+    Number(form.get("cantidad"))
+  ).toFixed(2);
+
+  const percent = volume/vehicle.capacidad*100;
+
+  state.cubicajes.push({
+    id:"c"+Date.now(),
+    referencia:form.get("referencia").trim(),
+    vehiculoId:vehicle.id,
+    vehiculoNombre:vehicle.nombre+" ("+vehicle.placa+")",
+    cantidad:Number(form.get("cantidad")),
+    volumen:volume,
+    porcentaje:percent,
+    fecha:todayISO()
+  });
+
+  document.querySelector("#cubicaje-result").textContent =
+    `Volumen total: ${fmt(volume)} m³ · Utilización estimada: ${fmt(percent)}%` +
+    (percent>100 ? " — supera la capacidad nominal." : "");
+
+  render();
+});
+
+document.querySelector("#space-form").addEventListener("submit",event => {
+  event.preventDefault();
+  const form = new FormData(event.currentTarget);
+
+  state.spaces.push({
+    id:"s"+Date.now(),
+    nombre:form.get("nombre").trim(),
+    ubicacion:form.get("ubicacion").trim(),
+    capacidad:Number(form.get("capacidad")),
+    ocupado:0
+  });
+
+  event.currentTarget.reset();
+  render();
+});
+
+document.querySelector("#storage-form").addEventListener("submit",event => {
+  event.preventDefault();
+
+  const form = new FormData(event.currentTarget);
+  const space = state.spaces.find(s => s.id===form.get("espacio"));
+  const volume = Number(form.get("volumen"));
+
+  if (!space) return;
+
+  if (volume > space.capacidad-space.ocupado) {
+    document.querySelector("#storage-result").textContent =
+      "Capacidad insuficiente: el volumen supera el espacio disponible.";
+    return;
+  }
+
+  space.ocupado = +(space.ocupado+volume).toFixed(2);
+
+  state.almacenamientos.push({
+    referencia:form.get("referencia").trim(),
+    espacioId:space.id,
+    espacioNombre:space.nombre,
+    volumen:volume,
+    fecha:todayISO()
+  });
+
+  document.querySelector("#storage-result").textContent =
+    `Movimiento registrado. Disponible en ${space.nombre}: ${fmt(space.capacidad-space.ocupado)} m³.`;
+
+  event.currentTarget.reset();
+  render();
+});
+
+document.querySelector("#reset-btn").addEventListener("click",() => {
+  if (confirm("¿Restaurar los datos de demostración?")) {
+    seedData();
+  }
+});
+
+document.querySelector("#export-btn").addEventListener("click",() => {
+  const rows = [
+    ["Referencia","Operacion","Volumen_m3","Destino","Fecha"],
+    ...state.cubicajes.map(c => [
+      c.referencia,"Cubicaje",c.volumen,c.vehiculoNombre,c.fecha
+    ]),
+    ...state.almacenamientos.map(a => [
+      a.referencia,"Almacenamiento",a.volumen,a.espacioNombre,a.fecha
+    ])
+  ];
+
+  const csv = rows.map(row =>
+    row.map(value =>
+      '"' + String(value ?? "").replace(/"/g,'""') + '"'
+    ).join(";")
+  ).join("\r\n");
+
+  const blob = new Blob(["\ufeff"+csv], {
+    type:"text/csv;charset=utf-8;"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "logiflow_operaciones.csv";
+  link.click();
+  URL.revokeObjectURL(url);
+});
+
+document.querySelector("#cubicaje-search").addEventListener("input",applySearch);
+document.querySelector("#operations-search").addEventListener("input",applySearch);
+
+document.querySelector("#today").textContent =
+  new Date().toLocaleDateString("es-CO",{
+    weekday:"short",
+    day:"2-digit",
+    month:"short",
+    year:"numeric"
+  });
+
+window.addEventListener("resize",drawMonthlyChart);
+
+seedData();
+</script>
+</body>
+</html>
